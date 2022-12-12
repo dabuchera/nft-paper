@@ -1,0 +1,12 @@
+{
+  "conventionalCommits.scopes": [
+    "stacks",
+    "upload",
+    "storage",
+    "tabs",
+    "files",
+    "header",
+    "playground",
+    "object"
+  ]
+}
