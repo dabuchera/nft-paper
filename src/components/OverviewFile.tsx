@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import { Type, FileText } from 'react-feather'
 import NextLink from 'next/link'
 import truncateMiddle from '@/lib/truncate'
+import { useAuth } from '@/hooks/use-auth'
 
 interface IOverviewFileProps {
   path: string
@@ -14,10 +15,12 @@ interface IOverviewFileProps {
 }
 
 const OverviewFile = ({ path, isPublic, isString, lastModified, url, userAddress }: IOverviewFileProps) => {
+  const { userData } = useAuth()
+
   return (
     <LinkBox
       as={Flex}
-      bg="whiteAlpha.200"
+      bg={userData?.profile.stxAddress.testnet === userAddress ? 'whiteAlpha.200' : 'whiteAlpha.500'}
       p={4}
       rounded="lg"
       flexDirection="column"
@@ -42,6 +45,7 @@ const OverviewFile = ({ path, isPublic, isString, lastModified, url, userAddress
             {path}
           </LinkOverlay>
         </NextLink>
+        {userData?.profile.stxAddress.testnet === userAddress ? <Badge colorScheme="blue">Yours</Badge> : <></>}
         {isPublic ? <Badge colorScheme="green">Public</Badge> : <Badge colorScheme="red">Private</Badge>}
       </HStack>
       <Box>

@@ -27,10 +27,13 @@ export const useStorage = () => {
     startMetadataRefreshingLoading()
     try {
       const resMetadata = await getMetadataFile()
+      console.log('resMetadata')
+      console.log(resMetadata)
       setMetadata(resMetadata)
 
       const resOverview = await getOverviewFile()
-      // console.log(resOverview)
+      console.log('resOverview')
+      console.log(resOverview)
       setPublicMetadata(resOverview)
     } catch (err) {
       console.error(err)
@@ -43,7 +46,13 @@ export const useStorage = () => {
     stopMetadataRefreshingLoading()
   }
 
-  const saveFile = async (path: string, data: any, isPublic: boolean = false, isString: boolean = true) => {
+  const saveFile = async (
+    path: string,
+    data: any,
+    isPublic: boolean = false,
+    shared: boolean = false,
+    isString: boolean = true
+  ) => {
     const existingMetadata = await getMetadataFile()
     const existingOverviewMetadata = await getOverviewFile()
 
@@ -59,6 +68,7 @@ export const useStorage = () => {
       isPublic,
       lastModified: new Date().toISOString(),
       url,
+      shared,
       isString,
     }
 
@@ -71,7 +81,6 @@ export const useStorage = () => {
           [path]: currentFileMetadata,
         }
       }
-
       await saveMetadataFile(newMetadata)
     } else {
       await saveMetadataFile({
@@ -87,14 +96,16 @@ export const useStorage = () => {
       isPublic,
       lastModified: new Date().toISOString(),
       url,
+      shared,
       isString,
     }
 
-    console.log('Object.keys(existingOverviewMetadata).length')
-    console.log(Object.keys(existingOverviewMetadata).length)
+    // console.log('Object.keys(existingOverviewMetadata).length')
+    // console.log(Object.keys(existingOverviewMetadata).length)
 
     // Public Metadata -> Overview of all files
-    if (Object.keys(existingOverviewMetadata).length !== 0) {
+    // if (Object.keys(existingOverviewMetadata).length !== 0) {
+    if (existingOverviewMetadata) {
       // console.log('existingOverviewMetadata')
       // console.log(existingOverviewMetadata)
       const newOverviewMetadata: PublicMetadataFile = existingOverviewMetadata
@@ -155,7 +166,6 @@ export const useStorage = () => {
         decrypt: true,
       })
       if (!metadata) return null
-      // console.log(JSON.parse(metadata as string))
       return JSON.parse(metadata as string)
     } catch (err) {
       console.error(err)
@@ -171,11 +181,17 @@ export const useStorage = () => {
           // return data -> Ohne encryption
           // console.log('data')
           // console.log(JSON.stringify(data))
+
+          // This happens if file is empty -> {}
+          if (Object.keys(data).length === 0) {
+            return null
+          }
           return userSession
             .decryptContent(JSON.stringify(data), {
               privateKey: '4e185081062dd819e0f251864817957704f17bb07baef49fa447bbbeb8b143e5',
             })
             .then((res) => {
+              // console.log(res)
               if (!res) return null
               // console.log('res')
               // console.log(res)
@@ -268,6 +284,43 @@ export const useStorage = () => {
     await refreshMetadata()
   }
 
+  const shareFile = async (path: string) => {
+    const existingMetadata = await getMetadataFile()
+    const existingOverviewMetadata = await getOverviewFile()
+
+    const file = existingMetadata.files[path]
+    console.log(file)
+
+    const data = await getFile(path)
+    console.log(data)
+
+    // Delete Private Metadata
+    const newMetadata: PrivateMetadataFile = {
+      ...existingMetadata,
+      files: { ...existingMetadata.files, [path]: undefined },
+    }
+
+    await saveMetadataFile(newMetadata)
+
+    await storage.deleteFile(path)
+
+    // Delete Public Metadata
+    const newOverviewMetadata: PublicMetadataFile = {
+      ...existingOverviewMetadata,
+      files: { ...existingOverviewMetadata.files, [path]: undefined },
+    }
+
+    await saveOverviewFile(newOverviewMetadata)
+
+    await refreshMetadata()
+
+    const encryptedData = await userSession.encryptContent(JSON.stringify(data), {
+      privateKey: '4e185081062dd819e0f251864817957704f17bb07baef49fa447bbbeb8b143e5',
+    })
+
+    await saveFile(path, encryptedData, true, true, file.dataType)
+  }
+
   const deleteAllFiles = async () => {
     const paths: string[] = []
     await storage.listFiles((path) => {
@@ -323,6 +376,7 @@ export const useStorage = () => {
     getMetadataFile,
     getFileMetadata,
     saveMetadataFile,
+    shareFile,
     deleteFile,
     deleteAllFiles,
     deletePublicFile,

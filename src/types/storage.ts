@@ -7,6 +7,7 @@ export type IPrivateFile = {
   isPublic: boolean
   isString: boolean
   lastModified: string
+  shared: boolean
   url: string
 }
 
@@ -19,6 +20,7 @@ export type IPublicFile = {
   isPublic: boolean
   isString: boolean
   lastModified: string
+  shared: boolean
   url: string
   userAddress: string
 }

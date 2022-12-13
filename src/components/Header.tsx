@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/use-auth'
 import { Box, Flex, IconButton, Button, Stack, Collapse, Link, useDisclosure, Icon } from '@chakra-ui/react'
-import { Home, Menu, Upload, X, Info } from 'react-feather'
+import { Home, Play, Menu, Upload, X, Info } from 'react-feather'
 import NextLink from 'next/link'
 import { LogIn, LogOut } from 'react-feather'
 import Logo from '@/components/Logo'
@@ -13,6 +13,11 @@ interface NavItem {
 }
 
 const NAV_ITEMS: Array<NavItem> = [
+  {
+    label: 'Playground',
+    href: '/playground',
+    icon: Play,
+  },
   {
     label: 'Home',
     href: '/',
@@ -35,12 +40,8 @@ const Header = () => {
 
   const { authenticate, logout, userData } = useAuth()
 
-  const { test } = useStorage()
-
   return (
     <Box>
-      <Button onClick={test}>Test</Button>
-
       <Flex
         minH={'60px'}
         py={{ base: 2 }}
