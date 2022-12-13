@@ -6,7 +6,7 @@ import useLoading from './use-loading'
 import { useToast } from '@chakra-ui/react'
 import { AppConfig, UserSession } from '@stacks/connect'
 
-const PRIVATE_METADATA_FILE_PATH = '.vaultacks/metadata.json'
+const PRIVATE_METADATA_FILE_PATH = '.private/metadata.json'
 const PUBLIC_METADATA_FILE_PATH = 'https://json-server-brown.vercel.app/profile'
 
 export const useStorage = () => {

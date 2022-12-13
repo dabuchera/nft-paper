@@ -1,4 +1,4 @@
-import { useStorage } from "@/hooks/use-storage";
+import { useStorage } from '@/hooks/use-storage'
 import {
   Box,
   Heading,
@@ -11,70 +11,66 @@ import {
   Button,
   Badge,
   useClipboard,
-} from "@chakra-ui/react";
-import { Type, FileText, Copy, Check, Download } from "react-feather";
-import { NextPage } from "next";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { NextSeo } from "next-seo";
-import useLoading from "@/hooks/use-loading";
-import { IPrivateFile } from "@/types/storage";
+} from '@chakra-ui/react'
+import { Type, FileText, Copy, Check, Download } from 'react-feather'
+import { NextPage } from 'next'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { NextSeo } from 'next-seo'
+import useLoading from '@/hooks/use-loading'
+import { IPrivateFile } from '@/types/storage'
 
 const ObjectPage: NextPage = () => {
   const {
     query: { path },
-  } = useRouter();
-  const { getFile, getFileMetadata } = useStorage();
+  } = useRouter()
+  const { getFile, getFileMetadata } = useStorage()
 
-  const [metadata, setMetadata] = useState<IPrivateFile>();
-  const [text, setText] = useState<string>("");
-  const { onCopy: onTextCopy, hasCopied: hasCopiedText } = useClipboard(text);
-  const {
-    isLoading: isDownloading,
-    startLoading: startDownloadLoading,
-    stopLoading: stopDownloadLoading,
-  } = useLoading();
+  const [metadata, setMetadata] = useState<IPrivateFile>()
+  const [text, setText] = useState<string>('')
+  const { onCopy: onTextCopy, hasCopied: hasCopiedText } = useClipboard(text)
+  const { isLoading: isDownloading, startLoading: startDownloadLoading, stopLoading: stopDownloadLoading } = useLoading()
 
   const handleFileDownload = async () => {
-    startDownloadLoading();
+    startDownloadLoading()
     if (metadata) {
-      const data = await getFile(metadata.path, !metadata.isPublic);
+      const data = await getFile(metadata.path, !metadata.isPublic)
 
       const blob = new Blob([data as ArrayBuffer], {
-        type: "application/octet-stream",
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = metadata.path;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+        type: 'application/octet-stream',
+      })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = metadata.path
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     }
-    stopDownloadLoading();
-  };
+    stopDownloadLoading()
+  }
 
   useEffect(() => {
     const fetchFile = async () => {
       if (path) {
-        const pathParsed = (path as string).trim();
-        const metadata = await getFileMetadata(pathParsed);
+        const pathParsed = (path as string).trim()
+        const metadata = await getFileMetadata(pathParsed)
 
-        setMetadata(metadata);
+        setMetadata(metadata)
 
         if (metadata.isString) {
-          const data = await getFile(pathParsed, !metadata.isPublic);
-          setText(data as string);
+          const data = await getFile(pathParsed, !metadata.isPublic)
+          setText(data as string)
         }
       }
-    };
+    }
 
-    fetchFile();
-  }, [path]);
+    fetchFile()
+  }, [path])
 
   return (
     <>
-      <NextSeo title={`${path} | Vaultacks`} />
+      <NextSeo title={`${path} | NFT-Paper`} />
       {metadata ? (
         <Box>
           <VStack spacing={4}>
@@ -92,11 +88,7 @@ const ObjectPage: NextPage = () => {
             <Heading as="h2" fontSize="2xl">
               {metadata.path}
             </Heading>
-            {metadata.isPublic ? (
-              <Badge colorScheme="green">Public</Badge>
-            ) : (
-              <Badge colorScheme="red">Private</Badge>
-            )}
+            {metadata.isPublic ? <Badge colorScheme="green">Public</Badge> : <Badge colorScheme="red">Private</Badge>}
             {metadata.isString ? (
               text ? (
                 <VStack>
@@ -104,23 +96,17 @@ const ObjectPage: NextPage = () => {
                     {text}
                   </Text>
                   <IconButton
-                    icon={
-                      hasCopiedText ? <Icon as={Check} /> : <Icon as={Copy} />
-                    }
+                    icon={hasCopiedText ? <Icon as={Check} /> : <Icon as={Copy} />}
                     aria-label="Copy Text"
                     onClick={onTextCopy}
-                    colorScheme={hasCopiedText ? "green" : "gray"}
+                    colorScheme={hasCopiedText ? 'green' : 'gray'}
                   />
                 </VStack>
               ) : (
                 <Spinner />
               )
             ) : (
-              <Button
-                leftIcon={<Icon as={Download} />}
-                onClick={handleFileDownload}
-                isLoading={isDownloading}
-              >
+              <Button leftIcon={<Icon as={Download} />} onClick={handleFileDownload} isLoading={isDownloading}>
                 Download
               </Button>
             )}
@@ -130,7 +116,7 @@ const ObjectPage: NextPage = () => {
         <Spinner />
       )}
     </>
-  );
-};
+  )
+}
 
-export default ObjectPage;
+export default ObjectPage

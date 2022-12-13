@@ -1,36 +1,28 @@
-import "../../styles/globals.css";
-import type { AppProps } from "next/app";
-import {
-  ChakraProvider,
-  Text,
-  Center,
-  Button,
-  Heading,
-  Link,
-  Icon,
-} from "@chakra-ui/react";
-import { useEffect } from "react";
-import { LogIn } from "react-feather";
-import { DefaultSeo } from "next-seo";
-import { theme } from "../theme";
-import { useAuth } from "@/hooks/use-auth";
-import Header from "@/components/Header";
-import SEO from "../../next-seo.config";
-import Logo from "@/components/Logo";
-import Footer from "@/components/Footer";
+import '../../styles/globals.css'
+import type { AppProps } from 'next/app'
+import { ChakraProvider, Text, Center, Button, Heading, Link, Icon } from '@chakra-ui/react'
+import { useEffect } from 'react'
+import { LogIn } from 'react-feather'
+import { DefaultSeo } from 'next-seo'
+import { theme } from '../theme'
+import { useAuth } from '@/hooks/use-auth'
+import Header from '@/components/Header'
+import SEO from '../../next-seo.config'
+import Logo from '@/components/Logo'
+import Footer from '@/components/Footer'
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const { userSession, setUserData, authenticate, userData } = useAuth();
+  const { userSession, setUserData, authenticate, userData } = useAuth()
 
   useEffect(() => {
     if (userSession.isSignInPending()) {
-      userSession.handlePendingSignIn().then(userData => {
-        setUserData(userData);
-      });
+      userSession.handlePendingSignIn().then((userData) => {
+        setUserData(userData)
+      })
     } else if (userSession.isUserSignedIn()) {
-      setUserData(userSession.loadUserData());
+      setUserData(userSession.loadUserData())
     }
-  }, [userSession, setUserData]);
+  }, [userSession, setUserData])
 
   return (
     <ChakraProvider theme={theme}>
@@ -42,19 +34,14 @@ function MyApp({ Component, pageProps }: AppProps) {
         ) : (
           <>
             <Logo height={128} width={128} />
-            <Heading>Vaultacks</Heading>
+            <Heading>NFT-Paper</Heading>
             <Text as="h2" fontSize="xl" textAlign="center" mt={4} mb={16}>
-              Vaultacks stores your data off-chain using{" "}
-              <Link
-                href="https://docs.stacks.co/docs/gaia/"
-                isExternal
-                color="blue.400"
-              >
+              This prototype stores your data off-chain using{' '}
+              <Link href="https://docs.stacks.co/docs/gaia/" isExternal color="blue.400">
                 Gaia
               </Link>
-              . Files are encrypted by default and can only be decrypted by your
-              wallet. You can also store public files, which will be stored in
-              an unencrypted form.
+              . Files are encrypted by default and can only be decrypted by your wallet. You can also store public files,
+              which will be stored in an unencrypted form.
             </Text>
 
             <Text fontSize="xl">Please connect your wallet to continue</Text>
@@ -63,7 +50,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               onClick={authenticate}
               bg="blue.600"
               color="white"
-              _hover={{ bg: "blue.500" }}
+              _hover={{ bg: 'blue.500' }}
               leftIcon={<Icon as={LogIn} />}
             >
               Connect Wallet
@@ -73,7 +60,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Center>
       <Footer />
     </ChakraProvider>
-  );
+  )
 }
 
-export default MyApp;
+export default MyApp

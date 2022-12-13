@@ -1,20 +1,13 @@
 const defaultSEOConfig = {
-  title: "Vaultacks",
-  description:
-    "Store data off-chain using Gaia. Encryption offered by default.",
+  title: 'NFT-Paper',
+  description: 'Prototype for EC3 Conference Paper.',
   openGraph: {
-    type: "website",
-    url: "https://vaultacks.vercel.app/",
-    site_name: "Vaultacks",
-    title: "Vaultacks",
-    description:
-      "Store data off-chain using Gaia. Encryption offered by default.",
+    type: 'website',
+    url: 'TBF',
+    site_name: 'TBF',
+    title: 'TBF',
+    description: 'Prototype for EC3 Conference Paper.',
   },
-  twitter: {
-    handle: "@AnishDe12020",
-    site: "@AnishDe12020",
-    cardType: "summary_large_image",
-  },
-};
+}
 
-export default defaultSEOConfig;
+export default defaultSEOConfig
