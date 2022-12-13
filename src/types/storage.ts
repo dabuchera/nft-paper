@@ -1,24 +1,24 @@
 export type PrivateMetadataFile = {
-  files: IPrivateFile[];
-};
+  files: IPrivateFile[]
+}
 
 export type IPrivateFile = {
-  path: string;
-  isPublic: boolean;
-  isString: boolean;
-  lastModified: string;
-  url: string;
-};
+  path: string
+  isPublic: boolean
+  isString: boolean
+  lastModified: string
+  url: string
+}
 
 export type PublicMetadataFile = {
-  files: IPublicFile[];
-};
+  files: IPublicFile[]
+}
 
 export type IPublicFile = {
-  userAddress: string,
-  path: string;
-  isPublic: boolean;
-  isString: boolean;
-  lastModified: string;
-  url: string;
-};
+  path: string
+  isPublic: boolean
+  isString: boolean
+  lastModified: string
+  url: string
+  userAddress: string
+}

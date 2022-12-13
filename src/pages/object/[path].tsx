@@ -18,15 +18,15 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { NextSeo } from 'next-seo'
 import useLoading from '@/hooks/use-loading'
-import { IPrivateFile } from '@/types/storage'
+import { IPrivateFile, IPublicFile } from '@/types/storage'
 
 const ObjectPage: NextPage = () => {
   const {
     query: { path },
   } = useRouter()
-  const { getFile, getFileMetadata } = useStorage()
+  const { getFile, getEncryptedFile, getFileMetadata } = useStorage()
 
-  const [metadata, setMetadata] = useState<IPrivateFile>()
+  const [metadata, setMetadata] = useState<IPrivateFile | IPublicFile>()
   const [text, setText] = useState<string>('')
   const { onCopy: onTextCopy, hasCopied: hasCopiedText } = useClipboard(text)
   const { isLoading: isDownloading, startLoading: startDownloadLoading, stopLoading: stopDownloadLoading } = useLoading()
@@ -56,11 +56,19 @@ const ObjectPage: NextPage = () => {
         const pathParsed = (path as string).trim()
         const metadata = await getFileMetadata(pathParsed)
 
-        setMetadata(metadata)
+        if (metadata) {
+          setMetadata(metadata)
+        }
 
-        if (metadata.isString) {
+        // File of Logged In User
+        if (metadata.isString && !metadata.hasOwnProperty('userAddress')) {
           const data = await getFile(pathParsed, !metadata.isPublic)
           setText(data as string)
+          // File of NOT Logged In User
+        } else if (metadata.isString && metadata.hasOwnProperty('userAddress')) {
+          console.log(metadata.url)
+          const data = await getEncryptedFile(metadata.url)
+          setText(data.cipherText as string)
         }
       }
     }

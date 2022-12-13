@@ -1,64 +1,65 @@
-import { useAuth } from "@/hooks/use-auth";
-import {
-  Box,
-  Flex,
-  IconButton,
-  Button,
-  Stack,
-  Collapse,
-  Link,
-  useDisclosure,
-  Icon,
-} from "@chakra-ui/react";
-import { Menu, Upload, X } from "react-feather";
-import NextLink from "next/link";
-import { LogIn, LogOut } from "react-feather";
-import Logo from "@/components/Logo";
+import { useAuth } from '@/hooks/use-auth'
+import { Box, Flex, IconButton, Button, Stack, Collapse, Link, useDisclosure, Icon } from '@chakra-ui/react'
+import { Home, Menu, Upload, X, Info } from 'react-feather'
+import NextLink from 'next/link'
+import { LogIn, LogOut } from 'react-feather'
+import Logo from '@/components/Logo'
+import { useStorage } from '@/hooks/use-storage'
 
 interface NavItem {
-  label: string;
-  href?: string;
+  label: string
+  href?: string
+  icon: any
 }
 
 const NAV_ITEMS: Array<NavItem> = [
   {
-    label: "Upload",
-    href: "/upload",
+    label: 'Home',
+    href: '/',
+    icon: Home,
   },
-];
+  {
+    label: 'Upload',
+    href: '/upload',
+    icon: Upload,
+  },
+  {
+    label: 'Available Files',
+    href: '/overview',
+    icon: Info,
+  },
+]
 
 const Header = () => {
-  const { isOpen, onToggle } = useDisclosure();
+  const { isOpen, onToggle } = useDisclosure()
 
-  const { authenticate, logout, userData } = useAuth();
+  const { authenticate, logout, userData } = useAuth()
+
+  const { test } = useStorage()
 
   return (
     <Box>
+      <Button onClick={test}>Test</Button>
+
       <Flex
-        minH={"60px"}
+        minH={'60px'}
         py={{ base: 2 }}
         px={{ base: 4 }}
-        align={"center"}
+        align={'center'}
         borderBottom="1px"
         borderColor="brand.secondary"
-        justifyContent={"space-between"}
+        justifyContent={'space-between'}
       >
         <IconButton
           onClick={onToggle}
-          icon={
-            isOpen ? (
-              <Icon as={X} w={5} h={5} />
-            ) : (
-              <Icon as={Menu} w={5} h={5} />
-            )
-          }
-          variant={"ghost"}
-          aria-label={"Toggle Navigation"}
-          display={{ md: "none" }}
+          icon={isOpen ? <Icon as={X} w={5} h={5} /> : <Icon as={Menu} w={5} h={5} />}
+          variant={'ghost'}
+          aria-label={'Toggle Navigation'}
+          display={{ md: 'none' }}
         />
         <NextLink href="/" passHref>
           <Link
-            fontFamily={"heading"}
+            fontFamily={'heading'}
             color="white"
             fontSize="2xl"
             fontWeight="bold"
@@ -82,7 +83,7 @@ const Header = () => {
             onClick={authenticate}
             bg="blue.600"
             color="white"
-            _hover={{ bg: "blue.500" }}
+            _hover={{ bg: 'blue.500' }}
             leftIcon={<Icon as={LogIn} />}
           >
             Connect Wallet
@@ -94,60 +95,55 @@ const Header = () => {
         <MobileNav />
       </Collapse>
     </Box>
-  );
-};
+  )
+}
 
 const DesktopNav = () => {
   return (
-    <Stack
-      direction={"row"}
-      spacing={4}
-      display={{ base: "none", md: "flex" }}
-      mr={-24}
-    >
-      {NAV_ITEMS.map(navItem => (
-        <NextLink key={navItem.label} href={navItem.href ?? "#"} passHref>
+    <Stack direction={'row'} spacing={4} display={{ base: 'none', md: 'flex' }} mr={-24}>
+      {NAV_ITEMS.map((navItem) => (
+        <NextLink key={navItem.label} href={navItem.href ?? '#'} passHref>
           <Link
             as={Button}
-            leftIcon={<Icon as={Upload} />}
+            leftIcon={<Icon as={navItem.icon} />}
             fontWeight="semibold"
             color="gray.100"
-            _hover={{ textDecoration: "none" }}
+            _hover={{ textDecoration: 'none' }}
           >
             {navItem.label}
           </Link>
         </NextLink>
       ))}
     </Stack>
-  );
-};
+  )
+}
 
 const MobileNav = () => {
   return (
-    <Stack p={4} display={{ md: "none" }} borderBottom="1px solid #2d2d2e">
-      {NAV_ITEMS.map(navItem => (
+    <Stack p={4} display={{ md: 'none' }} borderBottom="1px solid #2d2d2e">
+      {NAV_ITEMS.map((navItem) => (
         <MobileNavItem key={navItem.label} {...navItem} />
       ))}
     </Stack>
-  );
-};
+  )
+}
 
 const MobileNavItem = ({ label, href }: NavItem) => {
   return (
-    <NextLink href={href ?? "#"} passHref>
+    <NextLink href={href ?? '#'} passHref>
       <Link
         py={2}
-        href={href ?? "#"}
+        href={href ?? '#'}
         fontWeight="semibold"
         color="gray.100"
         _hover={{
-          color: "gray.300",
+          color: 'gray.300',
         }}
       >
         {label}
       </Link>
     </NextLink>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
