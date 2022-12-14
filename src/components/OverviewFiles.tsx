@@ -41,7 +41,7 @@ const OverviewFiles = () => {
         <Grid templateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap={6} w="100%">
           {publicMetadata && Object.keys(publicMetadata.files).length > 0 ? (
             Object.keys(publicMetadata.files).map((path) => {
-              const { isPublic, isString, lastModified, url, userAddress }: IPublicFile = publicMetadata?.files[
+              const { isPublic, isString, lastModified, shared, url, userAddress }: IPublicFile = publicMetadata?.files[
                 path as keyof PublicMetadataFile['files']
               ] as IPublicFile
               return (
@@ -51,6 +51,7 @@ const OverviewFiles = () => {
                   isPublic={isPublic}
                   isString={isString}
                   lastModified={lastModified}
+                  shared={shared}
                   url={url}
                   userAddress={userAddress}
                 />

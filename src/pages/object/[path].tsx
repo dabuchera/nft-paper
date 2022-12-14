@@ -24,7 +24,7 @@ const ObjectPage: NextPage = () => {
   const {
     query: { path },
   } = useRouter()
-  const { getFile, getEncryptedFile, getFileMetadata } = useStorage()
+  const { getFile, getFileMetadata } = useStorage()
 
   const [metadata, setMetadata] = useState<IPrivateFile | IPublicFile>()
   const [text, setText] = useState<string>('')
@@ -60,15 +60,11 @@ const ObjectPage: NextPage = () => {
           setMetadata(metadata)
         }
 
-        // File of Logged In User
-        if (metadata.isString && !metadata.hasOwnProperty('userAddress')) {
-          const data = await getFile(pathParsed, !metadata.isPublic)
+        // Whether the correct data is displayed or not is checked in the use-storage.ts
+        if (metadata.isString) {
+          const data = await getFile(metadata.url, !metadata.isPublic)
+          // console.log(data)
           setText(data as string)
-          // File of NOT Logged In User
-        } else if (metadata.isString && metadata.hasOwnProperty('userAddress')) {
-          console.log(metadata.url)
-          const data = await getEncryptedFile(metadata.url)
-          setText(data.cipherText as string)
         }
       }
     }
@@ -96,7 +92,15 @@ const ObjectPage: NextPage = () => {
             <Heading as="h2" fontSize="2xl">
               {metadata.path}
             </Heading>
-            {metadata.isPublic ? <Badge colorScheme="green">Public</Badge> : <Badge colorScheme="red">Private</Badge>}
+            {metadata.isPublic ? (
+              metadata.shared ? (
+                <Badge colorScheme="orange">Shared</Badge>
+              ) : (
+                <Badge colorScheme="green">Public</Badge>
+              )
+            ) : (
+              <Badge colorScheme="red">Private</Badge>
+            )}
             {metadata.isString ? (
               text ? (
                 <VStack>

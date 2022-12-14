@@ -1,6 +1,6 @@
 import { useAuth } from '@/hooks/use-auth'
 import { Box, Flex, IconButton, Button, Stack, Collapse, Link, useDisclosure, Icon } from '@chakra-ui/react'
-import { Home, Play, Menu, Upload, X, Info } from 'react-feather'
+import { Home, Play, Menu, Upload, X, Info, UserCheck } from 'react-feather'
 import NextLink from 'next/link'
 import { LogIn, LogOut } from 'react-feather'
 import Logo from '@/components/Logo'
@@ -32,6 +32,11 @@ const NAV_ITEMS: Array<NavItem> = [
     label: 'Available Files',
     href: '/overview',
     icon: Info,
+  },
+  {
+    label: 'Control Mgmt',
+    href: '/control',
+    icon: UserCheck,
   },
 ]
 

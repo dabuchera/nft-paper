@@ -7,7 +7,7 @@ import { RefreshCcw } from 'react-feather'
 import NextLink from 'next/link'
 
 const Files = () => {
-  const { refreshMetadata, metadata, isMetadataRefreshing, test } = useStorage()
+  const { refreshMetadata, metadata, isMetadataRefreshing } = useStorage()
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -38,11 +38,19 @@ const Files = () => {
         <Grid templateColumns="repeat(auto-fit, minmax(300px, 1fr))" gap={6} w="100%">
           {metadata && Object.keys(metadata.files).length > 0 ? (
             Object.keys(metadata.files).map((path) => {
-              const { isPublic, isString, lastModified, url }: IPrivateFile = metadata?.files[
+              const { isPublic, isString, lastModified, shared, url }: IPrivateFile = metadata?.files[
                 path as keyof PrivateMetadataFile['files']
               ] as IPrivateFile
               return (
-                <File key={path} path={path} isPublic={isPublic} isString={isString} lastModified={lastModified} url={url} />
+                <File
+                  key={path}
+                  path={path}
+                  isPublic={isPublic}
+                  isString={isString}
+                  lastModified={lastModified}
+                  shared={shared}
+                  url={url}
+                />
               )
             })
           ) : (

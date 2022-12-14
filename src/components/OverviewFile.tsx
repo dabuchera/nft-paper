@@ -10,11 +10,12 @@ interface IOverviewFileProps {
   isPublic: boolean
   isString: boolean
   lastModified: string
+  shared: boolean
   url: string
   userAddress: string
 }
 
-const OverviewFile = ({ path, isPublic, isString, lastModified, url, userAddress }: IOverviewFileProps) => {
+const OverviewFile = ({ path, isPublic, isString, lastModified, shared, url, userAddress }: IOverviewFileProps) => {
   const { userData } = useAuth()
 
   return (
@@ -45,8 +46,17 @@ const OverviewFile = ({ path, isPublic, isString, lastModified, url, userAddress
             {path}
           </LinkOverlay>
         </NextLink>
+        {isPublic ? (
+          shared ? (
+            <Badge colorScheme="orange">Shared</Badge>
+          ) : (
+            <Badge colorScheme="green">Public</Badge>
+          )
+        ) : (
+          <Badge colorScheme="red">Private</Badge>
+        )}
         {userData?.profile.stxAddress.testnet === userAddress ? <Badge colorScheme="blue">Yours</Badge> : <></>}
-        {isPublic ? <Badge colorScheme="green">Public</Badge> : <Badge colorScheme="red">Private</Badge>}
+        {/* {isPublic ? <Badge colorScheme="green">Public</Badge> : <Badge colorScheme="red">Private</Badge>} */}
       </HStack>
       <Box>
         <Tooltip label={format(new Date(lastModified), 'PPPPpppp')}>

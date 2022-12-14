@@ -20,7 +20,7 @@ import {
   Link,
   Icon,
 } from '@chakra-ui/react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useDropzone, FileRejection } from 'react-dropzone'
 import { FilePlus, Upload as UploadIcon } from 'react-feather'
 import NextLink from 'next/link'
@@ -35,12 +35,27 @@ const Upload = () => {
 
   const [filename, setFilename] = useState<string>('')
   const [isPublic, setPublic] = useState<boolean>(false)
+  const [filesNames, setFilesNames] = useState<string[]>(new Array())
+
   const { isLoading: isFileReadLoading, startLoading: startFileReadLoading, stopLoading: stopFileReadLoading } = useLoading()
   const { isLoading: isUploadLoading, startLoading: startUploadLoading, stopLoading: stopUploadLoading } = useLoading()
 
-  const { saveFile } = useStorage()
+  const { saveFile, getOverviewFile } = useStorage()
 
   const toast = useToast()
+
+  useEffect(() => {
+    const fetchOverviewFile = async () => {
+      const file = await getOverviewFile()
+      let tempArr = new Array()
+      for (const key in file.files) {
+        tempArr.push(key)
+      }
+      setFilesNames(tempArr)
+    }
+
+    fetchOverviewFile()
+  }, [])
 
   const onDropAccepted = useCallback(
     (files: File[]) => {
@@ -104,6 +119,12 @@ const Upload = () => {
   }
 
   const handleFilenameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // console.log(filesNames.includes(e.target.value))
+    if (filesNames.includes(e.target.value)) {
+      e.target.value = ''
+      setFilename('')
+      return null
+    }
     setFilename(e.target.value)
   }
 

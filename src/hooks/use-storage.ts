@@ -27,12 +27,12 @@ export const useStorage = () => {
     startMetadataRefreshingLoading()
     try {
       const resMetadata = await getMetadataFile()
-      console.log('resMetadata')
+      console.log('resMetadata Lenght: ' + Object.keys(resMetadata.files).length)
       console.log(resMetadata)
       setMetadata(resMetadata)
 
       const resOverview = await getOverviewFile()
-      console.log('resOverview')
+      console.log('resOverview Lenght: ' + Object.keys(resOverview.files).length)
       console.log(resOverview)
       setPublicMetadata(resOverview)
     } catch (err) {
@@ -137,18 +137,116 @@ export const useStorage = () => {
   }
 
   // Get File which belongs to logged in user
-  const getFile = async (filename: string, doDecrypt: boolean = true) => {
-    const res = await storage.getFile(filename, {
-      decrypt: doDecrypt,
-    })
+  const getFile = async (url: string, doDecrypt: boolean = true) => {
+    // Check if File belongs to logged in user
+    const userAddress = userData?.profile.stxAddress.testnet
+    const resOverview = await getOverviewFile()
+    // console.log('YOURS?')
+    // console.log(resOverview?.files)
+    // console.log(userAddress === resOverview.files[filename].userAddress)
 
-    return res
+    var n = url.lastIndexOf('/')
+    var filename = url.substring(n + 1)
+    // console.log(filename)
+
+    // console.log(doDecrypt)
+
+    //*********************** File belongs to logged in user ***********************//
+    if (userAddress === resOverview.files[filename].userAddress) {
+      console.log('File belongs to logged in user')
+      const res = await storage.getFile(filename, {
+        decrypt: doDecrypt,
+      })
+      // console.log('res')
+      // console.log(res)
+
+      // if file is encrypted it means that it is a shared file
+      if (typeof res === 'string' || res instanceof String) {
+        if (res.includes('cipherText')) {
+          return await storage
+            .getFile(filename, {
+              decrypt: '4e185081062dd819e0f251864817957704f17bb07baef49fa447bbbeb8b143e5',
+            })
+            .then((res) => {
+              if (!res) return null
+              // console.log('res')
+              // console.log(res)
+              return res
+            })
+        }
+      }
+      return res
+    }
+    //*********************** File DOES NOT belongs to logged in user ***********************//
+    else {
+      console.log('File DOES NOT belongs to logged in user')
+      try {
+        console.log('url')
+        console.log(url)
+        return await fetch(url).then((response) => {
+          const contentType = response.headers.get('content-type')
+          // The response was a JSON object
+          // Process your data as a JavaScript object
+          if (contentType && contentType.indexOf('application/json') !== -1) {
+            return response.json().then((data) => {
+              console.log(data)
+              const res = JSON.stringify(data)
+              // Hier die Decryption machen
+              // Check if file is encrypted
+              if (typeof res === 'string' || (res as any) instanceof String) {
+                if (res.includes('cipherText')) {
+                  // console.log(res.includes('cipherText'))
+                  return '*******'
+                }
+              }
+              return data
+            })
+          }
+          // The response wasn't a JSON object
+          // Process your text as a String
+          else {
+            return response.text().then((text) => {
+              if (typeof text === 'string' || (text as any) instanceof String) {
+                if (text.includes('cipherText')) {
+                  // console.log(res.includes('cipherText'))
+                  return '*******'
+                }
+              }
+              return text
+            })
+          }
+        })
+
+        // return await fetch(url)
+        //   .then((response) => {
+        //     if (resOverview.files[filename].isPublic) {
+        //       return response.text
+        //     }
+        //     return response.json()
+        //   })
+        //   .then((data) => {
+        //     console.log(data)
+        //     const res = JSON.stringify(data)
+        //     // Hier die Decryption machen
+        //     // Check if file is encrypted
+        //     if (typeof res === 'string' || res instanceof String) {
+        //       if (res.includes('cipherText')) {
+        //         // console.log(res.includes('cipherText'))
+        //         return '*******'
+        //       }
+        //     }
+        //     return data
+        //   })
+      } catch (err) {
+        console.error(err)
+      }
+    }
   }
 
   // Get File which is usually encrypted
   const getEncryptedFile = async (path: string) => {
     try {
-      console.log(path)
+      // console.log(path)
       return await fetch(path)
         .then((response) => response.json())
         .then((data) => {
@@ -273,7 +371,6 @@ export const useStorage = () => {
     await storage.deleteFile(path)
 
     // Public Metadata -> Overview of all files
-
     const newOverviewMetadata: PublicMetadataFile = {
       ...existingOverviewMetadata,
       files: { ...existingOverviewMetadata.files, [path]: undefined },
@@ -284,41 +381,81 @@ export const useStorage = () => {
     await refreshMetadata()
   }
 
-  const shareFile = async (path: string) => {
+  const toggleshareFile = async (path: string) => {
     const existingMetadata = await getMetadataFile()
     const existingOverviewMetadata = await getOverviewFile()
 
     const file = existingMetadata.files[path]
-    console.log(file)
+    // console.log(file)
 
-    const data = await getFile(path)
-    console.log(data)
+    const data = await getFile(path, !file.isPublic)
+    // console.log(data)
 
-    // Delete Private Metadata
-    const newMetadata: PrivateMetadataFile = {
-      ...existingMetadata,
-      files: { ...existingMetadata.files, [path]: undefined },
+    //Allow sharing
+    if (!file.shared) {
+      // Delete Private Metadata
+      const newMetadata: PrivateMetadataFile = {
+        ...existingMetadata,
+        files: { ...existingMetadata.files, [path]: undefined },
+      }
+
+      await saveMetadataFile(newMetadata)
+
+      await storage.deleteFile(path)
+
+      // Delete Public Metadata
+      const newOverviewMetadata: PublicMetadataFile = {
+        ...existingOverviewMetadata,
+        files: { ...existingOverviewMetadata.files, [path]: undefined },
+      }
+
+      await saveOverviewFile(newOverviewMetadata)
+
+      await refreshMetadata()
+
+      let input
+
+      // Could be a string or file
+      // String not stringify
+      if (typeof data === 'string' || data instanceof String) {
+        input = data as any
+      } else {
+        input = JSON.stringify(data)
+      }
+
+      const encryptedData = await userSession.encryptContent(input, {
+        privateKey: '4e185081062dd819e0f251864817957704f17bb07baef49fa447bbbeb8b143e5',
+      })
+
+      await saveFile(path, encryptedData, true, true, file.dataType)
     }
+    // Revoke sharing
+    else {
+      // console.log('Revoke sharing')
+      // Delete Private Metadata
+      const newMetadata: PrivateMetadataFile = {
+        ...existingMetadata,
+        files: { ...existingMetadata.files, [path]: undefined },
+      }
 
-    await saveMetadataFile(newMetadata)
+      console.log(newMetadata)
 
-    await storage.deleteFile(path)
+      await saveMetadataFile(newMetadata)
 
-    // Delete Public Metadata
-    const newOverviewMetadata: PublicMetadataFile = {
-      ...existingOverviewMetadata,
-      files: { ...existingOverviewMetadata.files, [path]: undefined },
+      await storage.deleteFile(path)
+
+      // Delete Public Metadata
+      const newOverviewMetadata: PublicMetadataFile = {
+        ...existingOverviewMetadata,
+        files: { ...existingOverviewMetadata.files, [path]: undefined },
+      }
+
+      await saveOverviewFile(newOverviewMetadata)
+
+      await refreshMetadata()
+
+      await saveFile(path, data, false, false, file.dataType)
     }
-
-    await saveOverviewFile(newOverviewMetadata)
-
-    await refreshMetadata()
-
-    const encryptedData = await userSession.encryptContent(JSON.stringify(data), {
-      privateKey: '4e185081062dd819e0f251864817957704f17bb07baef49fa447bbbeb8b143e5',
-    })
-
-    await saveFile(path, encryptedData, true, true, file.dataType)
   }
 
   const deleteAllFiles = async () => {
@@ -371,12 +508,13 @@ export const useStorage = () => {
     storage,
     saveFile,
     getFile,
-    getEncryptedFile,
+    getOverviewFile,
+    // getEncryptedFile,
     getFileWithMeta,
     getMetadataFile,
     getFileMetadata,
     saveMetadataFile,
-    shareFile,
+    toggleshareFile,
     deleteFile,
     deleteAllFiles,
     deletePublicFile,

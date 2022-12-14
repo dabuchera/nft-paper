@@ -39,11 +39,12 @@ interface IFileProps {
   isPublic: boolean
   isString: boolean
   lastModified: string
+  shared: boolean
   url: string
 }
 
-const File = ({ path, isPublic, isString, lastModified, url }: IFileProps) => {
-  const { shareFile, deleteFile } = useStorage()
+const File = ({ path, isPublic, isString, lastModified, shared, url }: IFileProps) => {
+  const { toggleshareFile, deleteFile } = useStorage()
   const toast = useToast()
 
   const { isLoading: isLoading, startLoading: startLoading, stopLoading: stopLoading } = useLoading()
@@ -59,7 +60,7 @@ const File = ({ path, isPublic, isString, lastModified, url }: IFileProps) => {
   const handleShareFile = async (path: string) => {
     startLoading()
     try {
-      await shareFile(path)
+      await toggleshareFile(path)
     } catch (err) {
       console.error(err)
       toast({
@@ -126,7 +127,15 @@ const File = ({ path, isPublic, isString, lastModified, url }: IFileProps) => {
             {path}
           </LinkOverlay>
         </NextLink>
-        {isPublic ? <Badge colorScheme="green">Public</Badge> : <Badge colorScheme="red">Private</Badge>}
+        {isPublic ? (
+          shared ? (
+            <Badge colorScheme="orange">Shared</Badge>
+          ) : (
+            <Badge colorScheme="green">Public</Badge>
+          )
+        ) : (
+          <Badge colorScheme="red">Private</Badge>
+        )}
       </HStack>
       <Box>
         <Tooltip label={format(new Date(lastModified), 'PPPPpppp')}>
@@ -143,7 +152,7 @@ const File = ({ path, isPublic, isString, lastModified, url }: IFileProps) => {
             size="sm"
             onClick={onShareAlertDialogOpen}
           >
-            Share
+            {!shared ? 'Allow Sharing' : 'Revoke Sharing'}
           </Button>
           <AlertDialog
             isOpen={isShareAlertDialogOpen}
@@ -164,14 +173,14 @@ const File = ({ path, isPublic, isString, lastModified, url }: IFileProps) => {
                     onClick={async () => await handleShareFile(path)}
                     isLoading={isLoading}
                   >
-                    Share
+                    {!shared ? 'Allow Sharing' : 'Revoke Sharing'}
                   </Button>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialogOverlay>
           </AlertDialog>
         </Box>
-
+        {/* Delete Button and Modal */}
         <Box>
           <Button leftIcon={<Icon as={Trash2} />} colorScheme="red" bg="red.400" size="sm" onClick={onDeleteAlertDialogOpen}>
             Delete
@@ -204,6 +213,9 @@ const File = ({ path, isPublic, isString, lastModified, url }: IFileProps) => {
             </AlertDialogOverlay>
           </AlertDialog>
         </Box>
+      </Flex>
+      {/* Copy Gaia URL */}
+      <Flex experimental_spaceX={4}>
         {isPublic ? (
           <Button
             backgroundColor={hasCopiedGaiaUrl ? 'green.400' : 'cyan.400'}
