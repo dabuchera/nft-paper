@@ -144,42 +144,49 @@ const File = ({ path, isPublic, isString, lastModified, shared, url }: IFileProp
       </Box>
 
       <Flex experimental_spaceX={4}>
-        <Box>
-          <Button
-            leftIcon={<Icon as={Share2} />}
-            colorScheme="blue"
-            bg="blue.400"
-            size="sm"
-            onClick={onShareAlertDialogOpen}
-          >
-            {!shared ? 'Allow Sharing' : 'Revoke Sharing'}
-          </Button>
-          <AlertDialog
-            isOpen={isShareAlertDialogOpen}
-            onClose={onShareAlertDialogClose}
-            leastDestructiveRef={shareDialogCancelRef}
-          >
-            <AlertDialogOverlay>
-              <AlertDialogContent>
-                <AlertDialogHeader>Share File</AlertDialogHeader>
-                <AlertDialogBody>Are you sure you want to share this file? This operation cannot be undone.</AlertDialogBody>
-                <AlertDialogFooter as={Flex} experimental_spaceX={4}>
-                  <Button onClick={onShareAlertDialogClose} ref={shareDialogCancelRef}>
-                    Cancel
-                  </Button>
-                  <Button
-                    colorScheme="blue"
-                    bg="blue.400"
-                    onClick={async () => await handleShareFile(path)}
-                    isLoading={isLoading}
-                  >
-                    {!shared ? 'Allow Sharing' : 'Revoke Sharing'}
-                  </Button>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialogOverlay>
-          </AlertDialog>
-        </Box>
+        {isPublic && !shared ? (
+          <></>
+        ) : (
+          <Box>
+            <Button
+              leftIcon={<Icon as={Share2} />}
+              colorScheme="blue"
+              bg="blue.400"
+              size="sm"
+              onClick={onShareAlertDialogOpen}
+            >
+              {!shared ? 'Allow Sharing' : 'Revoke Sharing'}
+            </Button>
+
+            <AlertDialog
+              isOpen={isShareAlertDialogOpen}
+              onClose={onShareAlertDialogClose}
+              leastDestructiveRef={shareDialogCancelRef}
+            >
+              <AlertDialogOverlay>
+                <AlertDialogContent>
+                  <AlertDialogHeader>Share File</AlertDialogHeader>
+                  <AlertDialogBody>
+                    Are you sure you want to share this file? This operation cannot be undone.
+                  </AlertDialogBody>
+                  <AlertDialogFooter as={Flex} experimental_spaceX={4}>
+                    <Button onClick={onShareAlertDialogClose} ref={shareDialogCancelRef}>
+                      Cancel
+                    </Button>
+                    <Button
+                      colorScheme="blue"
+                      bg="blue.400"
+                      onClick={async () => await handleShareFile(path)}
+                      isLoading={isLoading}
+                    >
+                      {!shared ? 'Allow Sharing' : 'Revoke Sharing'}
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialogOverlay>
+            </AlertDialog>
+          </Box>
+        )}
         {/* Delete Button and Modal */}
         <Box>
           <Button leftIcon={<Icon as={Trash2} />} colorScheme="red" bg="red.400" size="sm" onClick={onDeleteAlertDialogOpen}>

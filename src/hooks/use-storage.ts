@@ -4,13 +4,13 @@ import { IPrivateFile, IPublicFile, PrivateMetadataFile, PublicMetadataFile } fr
 import { useState } from 'react'
 import useLoading from './use-loading'
 import { useToast } from '@chakra-ui/react'
-import { AppConfig, UserSession } from '@stacks/connect'
 
 const PRIVATE_METADATA_FILE_PATH = '.private/metadata.json'
-const PUBLIC_METADATA_FILE_PATH = 'https://json-server-heroku-eth.herokuapp.com/public'
+// const PUBLIC_METADATA_FILE_PATH = 'https://json-server-heroku-eth.herokuapp.com/public'
+const PUBLIC_METADATA_FILE_PATH = 'https://api.jsonbin.io/v3/b/639af46101a72b59f231285b?meta=false'
 
 export const useStorage = () => {
-  const { userSession, userData } = useAuth()
+  const { userSession, useSTXAddress } = useAuth()
   const [metadata, setMetadata] = useState<PrivateMetadataFile | undefined>()
   const [publicMetadata, setPublicMetadata] = useState<PublicMetadataFile | undefined>()
 
@@ -88,7 +88,7 @@ export const useStorage = () => {
       })
     }
 
-    const userAddress = userData?.profile.stxAddress.testnet
+    const userAddress = useSTXAddress()
 
     const currentPublicMetadata: IPublicFile = {
       userAddress,
@@ -139,7 +139,7 @@ export const useStorage = () => {
   // Get File which belongs to logged in user
   const getFile = async (url: string, doDecrypt: boolean = true) => {
     // Check if File belongs to logged in user
-    const userAddress = userData?.profile.stxAddress.testnet
+    const userAddress = useSTXAddress()
     const resOverview = await getOverviewFile()
     // console.log('YOURS?')
     // console.log(resOverview?.files)
@@ -277,7 +277,7 @@ export const useStorage = () => {
         .then((response) => response.json())
         .then((data) => {
           // return data -> Ohne encryption
-          // console.log('data')
+          // console.log('getOverviewFile -> data')
           // console.log(JSON.stringify(data))
 
           // This happens if file is empty -> {}
@@ -341,6 +341,8 @@ export const useStorage = () => {
         method: 'PUT',
         headers: {
           'Content-type': 'application/json',
+          'X-Master-Key': '$2b$10$OFwARP0y9m.ePAhdbHInQO7/1Hm653WR4C7qVDSzrBmgle/Qdepqq',
+          'X-Bin-Versioning': 'false',
         },
         // body: JSON.stringify(metadata),
         body: encrypted,
@@ -477,6 +479,8 @@ export const useStorage = () => {
         method: 'PUT',
         headers: {
           'Content-type': 'application/json',
+          'X-Master-Key': '$2b$10$OFwARP0y9m.ePAhdbHInQO7/1Hm653WR4C7qVDSzrBmgle/Qdepqq',
+          'X-Bin-Versioning': 'false',
         },
         // body: JSON.stringify(metadata),
         body: '',

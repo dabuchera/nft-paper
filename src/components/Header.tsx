@@ -4,7 +4,6 @@ import { Home, Play, Menu, Upload, X, Info, UserCheck } from 'react-feather'
 import NextLink from 'next/link'
 import { LogIn, LogOut } from 'react-feather'
 import Logo from '@/components/Logo'
-import { useStorage } from '@/hooks/use-storage'
 
 interface NavItem {
   label: string

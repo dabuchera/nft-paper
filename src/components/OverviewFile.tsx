@@ -12,16 +12,16 @@ interface IOverviewFileProps {
   lastModified: string
   shared: boolean
   url: string
-  userAddress: string
+  userAddress: string | undefined
 }
 
 const OverviewFile = ({ path, isPublic, isString, lastModified, shared, url, userAddress }: IOverviewFileProps) => {
-  const { userData } = useAuth()
+  const { useSTXAddress } = useAuth()
 
   return (
     <LinkBox
       as={Flex}
-      bg={userData?.profile.stxAddress.testnet === userAddress ? 'whiteAlpha.200' : 'whiteAlpha.500'}
+      bg={useSTXAddress() === userAddress ? 'whiteAlpha.200' : 'whiteAlpha.500'}
       p={4}
       rounded="lg"
       flexDirection="column"
@@ -55,7 +55,7 @@ const OverviewFile = ({ path, isPublic, isString, lastModified, shared, url, use
         ) : (
           <Badge colorScheme="red">Private</Badge>
         )}
-        {userData?.profile.stxAddress.testnet === userAddress ? <Badge colorScheme="blue">Yours</Badge> : <></>}
+        {useSTXAddress() === userAddress ? <Badge colorScheme="blue">Yours</Badge> : <></>}
         {/* {isPublic ? <Badge colorScheme="green">Public</Badge> : <Badge colorScheme="red">Private</Badge>} */}
       </HStack>
       <Box>

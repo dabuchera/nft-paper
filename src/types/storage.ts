@@ -22,5 +22,5 @@ export type IPublicFile = {
   lastModified: string
   shared: boolean
   url: string
-  userAddress: string
+  userAddress: string | undefined
 }

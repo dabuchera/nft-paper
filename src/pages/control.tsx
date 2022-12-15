@@ -34,13 +34,9 @@ const OverviewFiles = () => {
 
   const { isLoading: isLoading, startLoading: startLoading, stopLoading: stopLoading } = useLoading()
 
-  const {
-    isOpen: isShareAlertDialogOpen,
-    onOpen: onShareAlertDialogOpen,
-    onClose: onShareAlertDialogClose,
-  } = useDisclosure()
+  const { isOpen: isTestDialogOpen, onOpen: onTestDialogOpen, onClose: onTestDialogClose } = useDisclosure()
 
-  const shareDialogCancelRef = useRef<HTMLButtonElement>() as MutableRefObject<HTMLButtonElement>
+  const testDialogCancelRef = useRef<HTMLButtonElement>() as MutableRefObject<HTMLButtonElement>
 
   useEffect(() => {
     const fetchFiles = async () => {
@@ -50,9 +46,14 @@ const OverviewFiles = () => {
     fetchFiles()
   }, [])
 
-  const handleShareFile = async (path: string) => {
+  const handleShareFile = async (bool: boolean) => {
     startLoading()
     try {
+      toast({
+        title: 'Error deleting file',
+        description: 'Something went wrong. Please try again later',
+        status: 'error',
+      })
       //   await toggleshareFile(path)
     } catch (err) {
       console.error(err)
@@ -63,7 +64,7 @@ const OverviewFiles = () => {
       })
     }
     stopLoading()
-    onShareAlertDialogClose()
+    onTestDialogClose()
   }
 
   return (
@@ -74,40 +75,33 @@ const OverviewFiles = () => {
       </Text>
       <Flex experimental_spaceX={4}>
         <Box>
-          <Button
-            leftIcon={<Icon as={Share2} />}
-            colorScheme="blue"
-            bg="blue.400"
-            size="sm"
-            onClick={onShareAlertDialogOpen}
-          >
-            adasdasd
+          <Button leftIcon={<Icon as={Share2} />} colorScheme="blue" bg="blue.400" size="sm" onClick={onTestDialogOpen}>
+            test
           </Button>
-          <AlertDialog
-            isOpen={isShareAlertDialogOpen}
-            onClose={onShareAlertDialogClose}
-            leastDestructiveRef={shareDialogCancelRef}
-          >
+          <AlertDialog isOpen={isTestDialogOpen} onClose={onTestDialogClose} leastDestructiveRef={testDialogCancelRef}>
             <AlertDialogOverlay>
               <AlertDialogContent>
-                <AlertDialogHeader>Share File</AlertDialogHeader>
+                <AlertDialogHeader>Test</AlertDialogHeader>
                 <AlertDialogBody>Are you sure you want to share this file? This operation cannot be undone.</AlertDialogBody>
                 <AlertDialogFooter as={Flex} experimental_spaceX={4}>
-                  <Button onClick={onShareAlertDialogClose} ref={shareDialogCancelRef}>
+                  <Button onClick={onTestDialogClose} ref={testDialogCancelRef}>
                     Cancel
                   </Button>
                   <Button
                     colorScheme="blue"
                     bg="blue.400"
-                    // onClick={async () => await handleShareFile(path)}
+                    onClick={async () => await handleShareFile(false)}
                     isLoading={isLoading}
                   >
-                    asdasd
+                    test
                   </Button>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialogOverlay>
           </AlertDialog>
+        </Box>
+        <Box p={1}>
+          <Text fontSize="l">Sharing control for all files that allowed sharing</Text>
         </Box>
         {/* Delete Button and Modal */}
         {/* <Box>
