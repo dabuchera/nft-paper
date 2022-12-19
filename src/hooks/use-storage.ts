@@ -6,7 +6,6 @@ import useLoading from './use-loading'
 import { useToast } from '@chakra-ui/react'
 
 const PRIVATE_METADATA_FILE_PATH = '.private/metadata.json'
-// const PUBLIC_METADATA_FILE_PATH = 'https://json-server-heroku-eth.herokuapp.com/public'
 const PUBLIC_METADATA_FILE_PATH = 'https://api.jsonbin.io/v3/b/639af46101a72b59f231285b?meta=false'
 
 export const useStorage = () => {
